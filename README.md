@@ -19,3 +19,8 @@ This addon works both on singleplayer and multiplayer.
 <hr>
 
 You can also use command "bind key health_menu" to have easy access to health menu! (opening up menu with specified keyboard key).
+
+<h2>Installation:</h2>
+1. Download source code<br>
+2. Paste "lua" and "materials" folders into GarrysMod/garrysmod folder<br>
+3. Launch the game
