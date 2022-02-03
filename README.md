@@ -8,6 +8,8 @@ This addon works both on singleplayer and multiplayer.
 
 <hr>
 
+<h2>Commands:</h2>
+
 | Command          | Description                                                           |
 |------------------|-----------------------------------------------------------------------|
 | health_menu      | Opens up health adjustment menu                                       |
