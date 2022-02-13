@@ -1,7 +1,7 @@
 -- Thanks for help to folks from Garry's Mod discord server! :)
 
 local tick = 0
-local think_internal = 5
+local think_interval = 5
 
 util.AddNetworkString("net_health")
 util.AddNetworkString("net_suit")
