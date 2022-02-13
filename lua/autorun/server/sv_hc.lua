@@ -16,7 +16,7 @@ local god = false
 hook.Add("Think", "update_health", function()
     tick = tick + 1
 
-    if tick == think_internal then
+    if tick == think_interval then
         tick = 0
         net.Receive( "net_health", function(len, ply)
 
