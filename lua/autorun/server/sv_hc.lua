@@ -1,67 +1,73 @@
--- Thanks for help to folks from Garry's Mod discord server! :)
+util.AddNetworkString("save")
 
-local tick = 0
-local think_interval = 5
+local saved_data = {}
 
-util.AddNetworkString("net_health")
-util.AddNetworkString("net_suit")
-util.AddNetworkString("net_god")
-util.AddNetworkString("net_max_health")
-util.AddNetworkString("net_max_suit")
+hook.Add("PlayerInitialSpawn", "HealthChanger_AddTablePlayer", function(ply)
+    saved_data[ply] = {["hp2maxhp"] = true}
+end)
 
-local health = 100
-local suit = 0
-local god = false
+hook.Add("PlayerDisconnected", "HealthChanger_RemoveTablePlayer", function(ply)
+    saved_data[ply] = nil
+end)
 
-hook.Add("Think", "update_health", function()
-    tick = tick + 1
-
-    if tick == think_interval then
-        tick = 0
-        net.Receive( "net_health", function(len, ply)
-
-            health = net.ReadFloat()
-            ply:SetHealth(health)
-
-        end)
-
-        net.Receive( "net_suit", function(len, ply)
-
-            suit = net.ReadFloat()
-            ply:SetArmor(suit)
-
-            if suit <= 1 then
-                ply:SetArmor(0)
+hook.Add("PlayerLoadout", "HealthChanger_SpawnHealth", function(ply)
+    if saved_data[ply] then
+        if saved_data[ply]["maxhealth"] then
+            if saved_data[ply]["hp2maxhp"] == true then
+                ply:SetHealth(saved_data[ply]["maxhealth"])
             end
-
-        end)
-
-        net.Receive( "net_god", function(len, ply)
-
-            god = net.ReadBool()
-
-            if god then
-                ply:GodEnable()
-            else
-                ply:GodDisable()
-            end
-
-        end)
-
-        net.Receive( "net_max_health", function(len, ply)
-
-            health_max = net.ReadFloat()
-            ply:SetMaxHealth(health_max)
-
-        end)
-
-        net.Receive( "net_max_suit", function(len, ply)
-
-            suit_max = net.ReadFloat()
-            ply:SetMaxArmor(suit_max)
-
-        end)
-
+            ply:SetMaxHealth(saved_data[ply]["maxhealth"])
+        end
+        
+        if saved_data[ply]["maxarmor"] then
+            ply:SetMaxArmor(saved_data[ply]["maxarmor"])
+        end
+        
+        if saved_data[ply]["godmode"] then
+            ply:GodEnable()
+        else
+            ply:GodDisable()
+        end
     end
+end)
 
+net.Receive("save", function(len, ply)
+    local data = net.ReadTable()
+    if ply:Alive() then
+        if data.health then
+            ply:SetHealth(data.health)
+        end
+        
+        if data.maxhealth then
+            ply:SetMaxHealth(data.maxhealth)
+            saved_data[ply]["maxhealth"] = data.maxhealth
+        end
+        
+        if data.armor then
+            ply:SetArmor(data.armor)
+        end
+        
+        if data.maxarmor then
+            ply:SetMaxArmor(data.maxarmor)
+            saved_data[ply]["maxarmor"] = data.maxarmor
+        end
+        
+        if data.godmode then
+            ply:GodEnable()
+            saved_data[ply]["godmode"] = true
+        else
+            if data.godmode ~= nil and data.godmode == false then
+                ply:GodDisable()
+                saved_data[ply]["godmode"] = false 
+            end
+        end
+
+        if data.hp2maxhp then
+            saved_data[ply]["hp2maxhp"] = true
+        else
+            if data.hp2maxhp ~= nil and data.hp2maxhp == false then
+                saved_data[ply]["hp2maxhp"] = false
+            end
+        end
+    end
 end)
